@@ -1,0 +1,67 @@
+#include "Bullet.h"
+#include <iostream>
+using namespace std;
+
+
+
+
+
+void Bullet::toxy(int x, int y)
+{
+    cout << "\033[" << y << ";" << x << "H";
+}
+
+Bullet::~Bullet()
+{
+    Dshow();
+    sety(-1);
+}
+
+double Bullet::getBx()
+{
+    return x;
+}
+
+double Bullet::getBy()
+{
+    return y;
+}
+
+void Bullet::setx(double a)
+{
+    x = a;
+}
+
+void Bullet::sety(double a)
+{
+    y = a;
+}
+
+void Bullet::show()
+{
+    if (y <= 0)
+    {
+        toxy(x, y); // 移動到新位置
+        cout << " ";
+    }
+    else
+    {
+        toxy(x, y); // 移動到新位置
+        cout << "+";
+    }
+}
+
+
+void Bullet::Dshow()
+{
+    toxy(x, y); // 移動到上一個位置
+    cout << " "; // 刪除上一個位置的子彈
+
+}
+
+void Bullet::move()
+{
+    Dshow(); // 刪除上一個位置的子彈
+    y--; // 往上移動一格
+    show(); // 繪製新位置的子彈
+}
