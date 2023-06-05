@@ -1,0 +1,27 @@
+#ifndef  Player_h
+#define  Player_h
+
+#include"Bullet.h"
+class Player
+{
+private:
+    double x;
+    double y;
+    int hp = 100;
+    
+public:
+    void xy(int x, int y);
+
+    Player();
+    int gethp();
+    double Gety() const;
+    double Getx() const;
+    void movePlayer(int _x);
+    void drawPlayer();
+    void hurt();
+    void fire(Bullet& but);
+
+};
+
+
+#endif // !1
