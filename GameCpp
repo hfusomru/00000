@@ -1,0 +1,199 @@
+#include <iostream>
+#include <iomanip>
+#include <ctime>
+#include "Game.h"
+#include<Windows.h>
+#include < conio.h >
+#include "Player.h"
+#include"Enemy.h"
+#include <random>
+#include <thread>
+#define BT_MAX 120
+using namespace std;
+
+
+void lose();
+void win();
+void xy(int x, int y);
+
+void Game::startGame()
+{
+
+    cout << "\033[?25l";
+    system("mode con:cols=100 lines=30");
+
+    const int starttime = time(NULL);		//倒數計時
+    int countTime = 1;
+    int totalTime = 40;
+
+    Player player;
+    player.drawPlayer();
+
+    Bullet but[BT_MAX];
+    int butIndex = 0;
+
+    bool out = 0;
+
+    Enemy enemy;
+    clock_t delay = clock();
+    for (int i = 0; i <= 33; i++)
+    {
+        xy(86, i); cout << "|";
+    }
+    while (1)
+    {
+
+        if (time(NULL) - starttime == countTime)
+        {
+            sec = totalTime - (time(NULL) - starttime);
+            countTime++;
+        }
+        if (time(NULL) - starttime >= 0.3)
+        {
+            if (sec <= 0) sec = 0;
+            xy(15, 0); cout << "剩餘時間: " << sec << "   "; // update time 
+            xy(40, 0); cout << "分數: " << score << "  "; // update game score
+            xy(60, 0); cout << "HP: " << player.gethp() << "  ";
+        }
+
+        if (enemy.getY() >= 25) {
+            if (enemy.getY() == 25)
+            {
+                player.hurt();
+                enemy.boom();
+            }
+            enemy = Enemy();
+        }
+
+        if ((clock() - delay) >= 90)
+        {
+            enemy.drawEnemy();
+            this_thread::sleep_for(chrono::milliseconds(90));
+            enemy.eraseEnemy();
+            xy(86, enemy.getY()); cout << "|";
+            enemy.moveEnemy(enemy.getY() + 1);
+        }
+
+        if ((clock() - delay) >= 40)
+        {
+            if (GetAsyncKeyState('A') & 0x8000 || GetAsyncKeyState('a') & 0x8000) { // 如果按下 A 鍵
+                if (player.Getx() <= 5) player.movePlayer(5);
+                player.movePlayer(player.Getx() - 2);
+                player.drawPlayer(); // 繪製新的 player 物件
+            }
+
+            if (GetAsyncKeyState('D') & 0x8000 || GetAsyncKeyState('d') & 0x8000) { // 如果按下 D 鍵
+                if (player.Getx() >= 78) player.movePlayer(78);
+                player.movePlayer(player.Getx() + 2);
+                player.drawPlayer(); // 繪製新的 player 物件
+            }
+
+            if (GetAsyncKeyState('K') & 0x8000 || GetAsyncKeyState('k') & 0x8000) { // 如果按下 K 鍵
+                if (butIndex < BT_MAX) {
+                    but[butIndex].setx(player.Getx() + 1);
+                    but[butIndex].sety(player.Gety() - 1);
+                    but[butIndex].show();
+                    butIndex++;
+                }
+            }
+        }
+
+        for (int i = 0; i < butIndex; i++)
+        {
+            if ((but[i].getBy() == enemy.getY() || but[i].getBy() == enemy.getY() - 1 || but[i].getBy() == enemy.getY() - 2) && (but[i].getBx() == enemy.getX() || but[i].getBx() == enemy.getX() + 1 || but[i].getBx() == enemy.getX() + 2 || but[i].getBx() == enemy.getX() + 3 || but[i].getBx() == enemy.getX() + 4))
+            {
+                score++;
+                enemy.~Enemy();
+                but[i].~Bullet();
+            }
+            but[i].Dshow();
+            but[i].sety(but[i].getBy() - 1);
+            but[i].show();
+        }
+        if(player.gethp()<=0) 
+        {
+            lose();
+            out = 1;
+            break;
+        }
+        if (countTime > totalTime)//時間到結束遊戲
+        {
+            system("cls");		//清空螢幕
+
+            if (score >= 15) {
+                win();
+                out = 1;
+                break;
+            }
+            else {
+                lose();
+                out = 1;
+                break;
+            }
+
+        }
+        if (out == 1) break;
+    }
+}
+
+int Game::getScore() const
+{
+    return score;
+}
+void Game::setScore(int s)
+{
+    score = s;
+}
+int  Game::getSec() const
+{
+    return sec;
+}
+void xy(int x, int y)
+{
+	cout << "\033[" << y << ";" << x << "H";
+
+}
+
+void win()
+{
+	system("cls");		//清空螢幕
+	cout << "\n\n\n\n\n\n\n";
+	cout << "                            __________           __       __ " << endl;
+	cout << "__        __        __     |___    ___|         /  \\     / /" << endl;
+	cout << "\\ \\      /  \\      / /         |  |            / /\\ \\   / /" << endl;
+	cout << " \\ \\    / /\\ \\    / /          |  |           / / \\ \\  / / " << endl;
+	cout << "  \\ \\__/ /  \\ \\__/ /        ___|  |___       / /   \\ \\/ / " << endl;
+	cout << "   \\____/    \\____/        |__________|     /_/     \\__/ " << endl;
+	cout << "\n\n\n\n";
+	cout << "按b在一次\n按esc結束遊戲";
+}
+
+void lose()
+{
+	system("cls");		//清空螢幕
+	cout << "\n\n\n\n\n\n\n";
+	cout << " _             __________      _________        ________" << endl;
+	cout << "| |           |   ____   |     |  _______|     |  ______|" << endl;
+	cout << "| |           |  |    |  |     |  |______      | |______ " << endl;
+	cout << "| |           |  |    |  |     |_______  |     |  ______|" << endl;
+	cout << "| |_____      |  |____|  |      ______|  |     | |______" << endl;
+	cout << "|________|    |__________|     |_________|     |________|" << endl;
+	cout << "\n\n\n\n";
+	cout << "按b在一次\n按esc結束遊戲";
+}
+
+void Game::endGame()
+{
+    system("cls");		//清空螢幕
+    cout << "" << endl;
+    cout << "" << endl;
+    cout << "" << endl;
+    cout << "" << endl;
+    cout << " __________      __     __       ________" << endl;
+    cout << "|   _____  |     \\  \\  /  /     |  ______|" << endl;
+    cout << "|  |_____| /      \\  \\/  /      | |______" << endl;
+    cout << "|   _____  \\       |    |       |  ______|" << endl;
+    cout << "|  |_____| |       |    |       | |______ " << endl;
+    cout << "|__________|       |____|       |________|" << endl;
+    exit(1);
+}
