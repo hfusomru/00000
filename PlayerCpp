@@ -1,0 +1,80 @@
+#include "Player.h"
+#include<iostream>
+#include <chrono>
+#include <thread>
+#include <random>
+#include<Windows.h>
+#include"Bullet.h"
+
+
+#define   BT_MAX 100
+
+using namespace std;
+
+
+void Player::xy(int x, int y)
+{
+	cout << "\033[" << y << ";" << x << "H";
+
+}
+
+Player::Player()
+{
+	x = 35;
+	y = 25;
+}
+
+int Player::gethp()
+{
+	return hp;
+}
+
+double Player::Gety() const
+{
+	return y;
+}
+
+double Player::Getx() const
+{
+	return x;
+}
+
+
+
+void Player::movePlayer(int _x)
+{
+	x = _x;
+}
+
+void Player::drawPlayer()
+{
+
+	xy(x - 3, y + 1);
+	cout << "    X   ";
+	xy(x - 3, y + 2);
+	cout << "  XXXXX  ";
+	xy(x - 3, y + 3);
+	cout << "    X   ";
+	xy(x - 3, y + 4);
+	cout << "   XXX   ";
+
+}
+
+
+
+void Player::hurt()
+{
+	hp -= 10;
+
+}
+
+void Player::fire(Bullet& but) {
+	for (int i = 0; i < BT_MAX; i++) {
+		if (but.getBy() < 0) { // 找到第一個空閒的子彈
+			but.setx(x);
+			but.sety(y);
+			but.show();
+			break;
+		}
+	}
+}
